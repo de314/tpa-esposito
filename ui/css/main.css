@@ -1,0 +1,44 @@
+.text-muted {
+	color: #888;
+	font-style: italic;
+}
+
+.LeftNav {
+	border-right: 1px solid #ccc;
+	height: 100vh;
+}
+
+	.LeftNav .nav-sect {
+		border-top: 1px solid #ccc;
+		padding: 1em;
+		margin: 1em;
+	}
+
+	.LeftNav .btn, .btn-flat {
+		width: 100%;
+	}
+
+
+
+.InboxContainer {
+	padding: 2em 0;
+}
+
+	.InboxContainer .cta-row {
+		border-bottom: 1px solid #ccc;
+		width: 100%;
+		padding: 0.5em;
+	}
+
+	.InboxContainer .InboxRow {
+		padding: 0.5em 0;
+	}
+
+	.InboxContainer .InboxRow .tr-item {
+		margin-right: 1em;
+		display: inline-block;
+	}
+
+	.InboxContainer .InboxRow img {
+		width: 2em;
+	}
