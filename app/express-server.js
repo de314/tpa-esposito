@@ -2,14 +2,14 @@
 
 
 let express = require('express'),
-	config = require('app/conf');
+	config = require('app/conf'); // {base}/app/conf/index.js
 
 let ExpressServer = express();
 
 // Confgiure Express Environment
 ExpressServer.set('port', config.EXPRESS_PORT || 3333);
 
-// serve public dir
+// serve ui dir
 ExpressServer.use('/', express.static('ui'));
 
 // Start Express Server

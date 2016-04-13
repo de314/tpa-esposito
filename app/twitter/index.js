@@ -1,11 +1,18 @@
 "use strict";
 
+/*
+Entry point for the  twitter feature
+*/
 
+
+
+// register the express api endpoints
 require('app/twitter/endpoints');
 
-let twitter = require('app/twitter/twitter'),
-	tClient = twitter.tClient;
 
-// tClient.get('search/tweets', {q: 'node.js'}, function(error, tweets, response){
-//    console.log(tweets);
-// });
+
+// run any startup scripts below
+
+
+
+// start any required background processes below
