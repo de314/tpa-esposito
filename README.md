@@ -8,7 +8,7 @@ We would like you to develop a responsive page that displays twitter feeds. We w
 
 
 #### Requirement and Assumptions
-* Display a twitter feed
+* No restrictions on which/how twitter feed is displayed
 * Backend must be written in Node.js
 * Use front end framework/libraries of choice
 
@@ -23,7 +23,7 @@ We would like you to develop a responsive page that displays twitter feeds. We w
   * Anonymous access to timeline and search
 
 
-#### Architecture
+#### Project Structure
 * app
   * conf
     * index.js  // entry point for bootstraping config based on process.env.NODE_ENV
@@ -45,12 +45,16 @@ We would like you to develop a responsive page that displays twitter feeds. We w
 * package.json  // used to manage dependencies/build/run e.g. https://medium.freecodecamp.com/why-i-left-gulp-and-grunt-for-npm-scripts-3d6853dd22b8#.8hidpu0db
 * tpaMain.js  // node boot script
 
+Express serves static files from the `/ui` directory from the URL base. The twitter enpoints are located at `/api/twitter/[search, timeline]`
+
 #### Usage
 
 Install:
 ```
 git clone https://github.com/desposi1/tpa-esposito tpa && cd tpa && npm install
 ```
+This repo does *NOT* include my `app/conf/dev.js` config file. To run the server you need to get the file from me
+or `cp /app/conf/template.js app/conf/dev.js` and fill out the appropriate values with your own Twitter Application.
 
 Running
 ```
@@ -58,7 +62,8 @@ npm start
 ```
 
 UI
-[http://localhost:3000]
+
+<http://localhost:3000> or what ever port you used in `/app/conf/dev.js`. Port 3000 is default.
 
 Features:
 1. Use the tabs at the top to change tweet source. You can change between User Timeline and Twitter search.
