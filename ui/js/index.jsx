@@ -66,18 +66,18 @@ let FilterForm = React.createClass({
 			<div className="FilterForm">
 				<div className="row">
 					<div className="col s12">
-						// ideally, tabs would be abstracted into a separate react component
+						{/* ideally, tabs would be abstracted into a separate react component */}
 						<ul className="tabs">
 							<li className="tab col s6"><a href="#timeline-filter">User Timeline</a></li>
 							<li className="tab col s6"><a href="#search-filter">Tweet Search</a></li>
 						</ul>
 					</div>
-					// each of the following filter forms could/probably should be pulled out into a separate component
+					{/* each of the following filter forms could/probably should be pulled out into a separate component */}
 					<div id="timeline-filter" className="col s12">
 						<p>
 							View a users timeline by providing their twitter screen name below. You do not need to prepend the screen name with an "@".
 						</p>
-						// form required for Submit on [ENTER]
+						{/* form required for Submit on [ENTER] */}
 						<form onSubmit={ this.handleNewScreenName }>
 							<div className="input-field">
 								<input placeholder="TBSInc" id="screenName" type="text" defaultValue={ filter.screenName } />
@@ -159,7 +159,7 @@ let TweetList = React.createClass({
 				<div className="row">
 					<div className="col s12">
 						<div className="right">
-							// the on click handlers should be moved to redux action/reducers
+							{/* the on click handlers should be moved to redux action/reducers */}
 							<button className="btn waves-effect grey lighten-3 black-text"><i className="fa fa-list" onClick={ () => self.setState({ view: 'rows' }) }></i></button>
 							<button className="btn waves-effect grey lighten-3 black-text"><i className="fa fa-th" onClick={ () => self.setState({ view: 'tiles' }) }></i></button>
 						</div>
@@ -183,13 +183,13 @@ let TweetRow = React.createClass({
 			<div className="TweetRow">
 				<div className="card-panel">
 					<div className="row">
-						// responsive row layout
+						{/* responsive row layout */}
 						<div className="col s6 offset-s3 m4 l3">
 							<a href={ profileUrl }>
 								<img src={ t.user.profile_image_url } className="responsive-img circle"/>
 							</a>
 						</div>
-						// responsive row layout
+						{/* responsive row layout */}
 						<div className="col s12 m8 l9">
 							<div className="user-row row">
 								<div className="user-profile">
@@ -199,15 +199,15 @@ let TweetRow = React.createClass({
 									</a>
 								</div>
 								<div className="user-info">
-									// this moment pattern is used multiple times and should probably be pulled out into a util lib class (DRY)
+									{/* this moment pattern is used multiple times and should probably be pulled out into a util lib class (DRY) */}
 									<div className="text-muted">Registered: { moment(new Date(t.user.created_at)).fromNow() }</div>
 								</div>
 							</div>
 							<div className="tweet-row">
 								<div className="body">
 									<blockquote>
-										// entities from the twitter responses are not replaced with links/media. This is an improvement that could
-										// potentially be implemented using UI libs from Twitter/Embely.
+										{/* entities from the twitter responses are not replaced with links/media. This is an improvement that could
+											potentially be implemented using UI libs from Twitter/Embely. */}
 										{ t.text }
 									</blockquote>
 								</div>
