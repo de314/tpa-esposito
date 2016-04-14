@@ -51,6 +51,8 @@ Install:
 ```
 git clone https://github.com/desposi1/tpa-esposito tpa && cd tpa && npm install
 ```
+This repo does *NOT* include my `app/conf/dev.js` config file. To run the server you need to get the file from me
+or `cp /app/conf/template.js app/conf/dev.js` and fill out the appropriate values with your own Twitter Application.
 
 Running
 ```
@@ -58,7 +60,7 @@ npm start
 ```
 
 UI
-[http://localhost:3000]
+[http://localhost:3000] or what ever port you used in `/app/conf/dev.js`. Port 3000 is default.
 
 Features:
 1. Use the tabs at the top to change tweet source. You can change between User Timeline and Twitter search.
