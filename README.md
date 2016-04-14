@@ -23,7 +23,7 @@ We would like you to develop a responsive page that displays twitter feeds. We w
   * Anonymous access to timeline and search
 
 
-#### Architecture
+#### Project Structure
 * app
   * conf
     * index.js  // entry point for bootstraping config based on process.env.NODE_ENV
