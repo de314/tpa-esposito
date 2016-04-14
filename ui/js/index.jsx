@@ -1,150 +1,365 @@
 /*
-===================================
-		HOME/NAV
-===================================
+I debated how to implement the UI for the assessment. I decided to go with a demo-esque structure
+so that it is easier to follow and analyze.
+
+All client side application logic is contained in this file. It can be broken up into sections
+which are responsible for different parts of the app.
 */
 
-let LeftNav = React.createClass({
-	propTypes: {
-	    handle: React.PropTypes.string
-	},
-	renderAuth(handle) {
-		if (_.isEmpty(handle)) {
-			return '';
-		}
-		return (
-			<div className="supp-nav">
-				<div className="cta nav-sect compose">
-					<button className="btn waves-effect waves-light">Compose</button>
-				</div>
-				<div className="nav nav-sect">
-					<ul>
-						<li><a className="waves-effect waves-teal btn-flat">Inbox</a></li>
-						<li><a className="waves-effect waves-teal btn-flat">Sent</a></li>
-						<li><a className="waves-effect waves-teal btn-flat">Favorited</a></li>
-					</ul>
-				</div>
-			</div>
-		);
-	},
+
+
+/*
+=================================
+		General Utils
+=================================
+*/
+let Loading = React.createClass({
 	render() {
-		let { handle } = this.props,
-			additionalNav = !_.isEmpty(handle) ? this.renderAuth() : '';
 		return (
-			<div className="LeftNav">
-				<div className="brand nav-sect">
-					<h5>tMail.com</h5>
-				</div>
-				<div className="cta nav-sect login">
-					<AccountComp handle={ handle } />
-				</div>
-				{ this.renderAuth(handle) }
+			<div className="Loading">
+				Loading...
 			</div>
 		);
 	}
 });
 
-let AccountComp = React.createClass({
+
+
+/*
+=================================
+		Tweet Filter Form
+=================================
+Given more time I would implement this using Redux or more simple jQuery event driven logic.
+This maintains the state for Timeline and Search filter states as well as notifies the 
+application container when the filter has changed. This is done via a call back function.
+I believe that this is not a bad approach for smaller applications, POCs, and 1-offs but it
+woould not be a scalable solution for a larget application; especially for one that require
+multiple actions/tasks for a change of application state.
+*/
+let FilterForm = React.createClass({
 	propTypes: {
-	    handle: React.PropTypes.string
+	    onUpdateFilter: React.PropTypes.func.isRequired
+	},
+	componentDidMount() {
+		// Given more time, I would have use react refs, but this is simple materialize example code for initializin dynamically loaded tabs
+	    $('ul.tabs').tabs();  
+	},
+	// ideally, this would be pull out into an action/reducer in redux
+	handleNewScreenName(e) {
+		e.preventDefault();
+		let screenName = $('#screenName').val();
+		this.props.onUpdateFilter({
+			screenName
+		});
+	},
+	// ideally, this would be pull out into an action/reducer in redux
+	handleNewSearchTerms(e) {
+		e.preventDefault();
+		let q = $('#q').val();
+		this.props.onUpdateFilter({
+			q
+		});
+	},
+	render() {
+		let { filter } = this.props;
+		return (
+			<div className="FilterForm">
+				<div className="row">
+					<div className="col s12">
+						// ideally, tabs would be abstracted into a separate react component
+						<ul className="tabs">
+							<li className="tab col s6"><a href="#timeline-filter">User Timeline</a></li>
+							<li className="tab col s6"><a href="#search-filter">Tweet Search</a></li>
+						</ul>
+					</div>
+					// each of the following filter forms could/probably should be pulled out into a separate component
+					<div id="timeline-filter" className="col s12">
+						<p>
+							View a users timeline by providing their twitter screen name below. You do not need to prepend the screen name with an "@".
+						</p>
+						// form required for Submit on [ENTER]
+						<form onSubmit={ this.handleNewScreenName }>
+							<div className="input-field">
+								<input placeholder="TBSInc" id="screenName" type="text" defaultValue={ filter.screenName } />
+								<label className="active" for="screenName">Screen Name</label>
+							</div>
+							<div className="right">
+								<button className="btn waves-effect waves-light" type="submit">Submit</button>
+							</div>
+						</form>
+					</div>
+					<div id="search-filter" className="col s12">
+						<p>
+							Search tweets by entering a query below. You can search for mentions of a user with their screen name e.g. @TBSInc.
+						</p>
+						<form onSubmit={ this.handleNewSearchTerms }>
+							<div className="input-field">
+								<input placeholder="Turner Broadcasting" id="q" type="text" defaultValue={ filter.q } />
+								<label className="active" for="q">Search Terms</label>
+							</div>
+							<div className="right">
+								<button className="btn waves-effect waves-light" type="submit">Submit</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		);
+	}
+});
+
+
+// This should probably be converted to a container that passes appropriate state to
+// sub-components to implement the multiple view types.
+let TweetList = React.createClass({
+	propTypes: {
+		tweets: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
 	},
 	getInitialState() {
-	    return {
-	        exp: false,
-	        handle: undefined
-	    };
+		return {
+			view: 'rows'
+		};
 	},
-	handleLogin(e) {
-		let newHandle = $('#twitterHandle').val();
-		if (!_.isEmpty(newHandle)) {
-			$('body').trigger('twitter:onHandleChange', {
-				oldHandle: this.props.handle,
-				newHandle
-			});
-			this.setState({
-				exp: false
-			});
-		}
-	},
-	renderAuthForm(handle) {
+	// put in another component
+	renderRows(tweets) {
 		return (
-			<div className="input-field">
-				<input placeholder="dhh" id="twitterHandle" type="text" className="validate" defaultValue={ handle } />
-				<label className="active" for="twitterHandle">Twitter Handle</label>
-				<button className="btn waves-effect" onClick={ this.handleLogin }>Login</button>
+			<div className="tweet-rows">
+				{ tweets.map((t) => <TweetRow tweet={t} />) }
 			</div>
 		);
 	},
-	renderUsername(handle) {
+	// put in another component
+	renderTiles(tweets) {
 		return (
-				<div className="auth">
-					<span className="text-muted">Logged in as:</span> <a href="#login" onClick={ () => this.setState({ exp: true }) }>{ handle }</a>
+			<div className="tweet-tiles">
+				<div className="row">
+					{ tweets.map((t) => <TweetTile tweet={ t } />) }
 				</div>
-			);
-	},
-	renderAnon() {
-		return (
-			<div className="auth-anon">
-				<button className="btn red accent-4" onClick={ () => this.setState({ exp: true }) }>Please Log In</button>
 			</div>
 		);
 	},
 	render() {
-		let { exp } = this.state,
-			{ handle } = this.props,
-			content;
-		if (exp) {
-			content = this.renderAuthForm(handle);
-		} else if (!_.isEmpty(handle)) {
-			content = this.renderUsername(handle);
-		} else {
-			content = this.renderAnon();
+		let self = this,
+			{ tweets } = this.props;
+		if (!tweets) {
+			return <Loading />;
+		}
+		console.log('render', this.state.view);
+		let renderCb;
+		switch (this.state.view) {
+			case 'tiles':
+				renderCb = this.renderTiles;
+				break;
+			case 'rows':
+			default:
+				renderCb = this.renderRows;
 		}
 		return (
-			<div className="AccountComp">
-				{ content }
+			<div className="TweetList">
+				<div className="row">
+					<div className="col s12">
+						<div className="right">
+							// the on click handlers should be moved to redux action/reducers
+							<button className="btn waves-effect grey lighten-3 black-text"><i className="fa fa-list" onClick={ () => self.setState({ view: 'rows' }) }></i></button>
+							<button className="btn waves-effect grey lighten-3 black-text"><i className="fa fa-th" onClick={ () => self.setState({ view: 'tiles' }) }></i></button>
+						</div>
+					</div>
+				</div>
+				{ renderCb(tweets) }
+			</div>
+		);
+	}
+});
+
+// simple component to display model state
+let TweetRow = React.createClass({
+	propTypes: {
+	    tweet: React.PropTypes.object.isRequired
+	},
+	render() {
+		let { tweet: t } = this.props,
+			profileUrl = "https://twitter.com/" + t.user.screen_name;
+		return (
+			<div className="TweetRow">
+				<div className="card-panel">
+					<div className="row">
+						// responsive row layout
+						<div className="col s6 offset-s3 m4 l3">
+							<a href={ profileUrl }>
+								<img src={ t.user.profile_image_url } className="responsive-img circle"/>
+							</a>
+						</div>
+						// responsive row layout
+						<div className="col s12 m8 l9">
+							<div className="user-row row">
+								<div className="user-profile">
+									<a href={ profileUrl }>
+										<span className="username-header">{ t.user.name } (@{ t.user.screen_name })</span>
+										<span className="text-muted"><i className="fa fa-users"></i> { t.user.followers_count }</span>
+									</a>
+								</div>
+								<div className="user-info">
+									// this moment pattern is used multiple times and should probably be pulled out into a util lib class (DRY)
+									<div className="text-muted">Registered: { moment(new Date(t.user.created_at)).fromNow() }</div>
+								</div>
+							</div>
+							<div className="tweet-row">
+								<div className="body">
+									<blockquote>
+										// entities from the twitter responses are not replaced with links/media. This is an improvement that could
+										// potentially be implemented using UI libs from Twitter/Embely.
+										{ t.text }
+									</blockquote>
+								</div>
+								<div className="stats right">
+									<div className="chip">{ moment(new Date(t.created_at)).fromNow() }</div>
+									<div className="chip"><i className="fa fa-retweet"></i> { t.retweet_count }</div>
+									<div className="chip"><i className="fa fa-heart"></i> { t.favorite_count }</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	}
+});
+
+// simple component to display model state
+let TweetTile = React.createClass({
+	propTypes: {
+	    tweet: React.PropTypes.object.isRequired,
+	    tileWidthClass: React.PropTypes.string
+	},
+	getDefaultProps() {
+	    return {
+	    	// customizable reactive layout based on screen width. These are the defaults.
+	    	// Ideally, more break points would be implemented (bootstrap has an extra xs size).
+	        tileWidthClass: 'col s12 m10 offset-m1 l6'
+	    };
+	},
+	// very similar render function as TweetRow with a different layout.
+	render() {
+		let { tweet: t } = this.props,
+			profileUrl = "https://twitter.com/" + t.user.screen_name,
+			tileWidthClass = "TweetTile " + this.props.tileWidthClass;
+		return (
+			<div className={ tileWidthClass }>
+				<div className="card-panel">
+					<div className="row">
+						<div className="col s6">
+							<a href={ profileUrl }>
+								<img src={ t.user.profile_image_url } className="responsive-img circle"/>
+							</a>
+						</div>
+						<div className="col s6 valign-wrapper">
+							<div className="user-row row valign">
+								<div className="user-profile">
+									<a href={ profileUrl }>
+										<span className="username-header">{ t.user.name } (@{ t.user.screen_name })</span>
+										<span className="text-muted"><i className="fa fa-users"></i> { t.user.followers_count }</span>
+									</a>
+								</div>
+								<div className="user-info">
+									<div className="text-muted">Registered: { moment(new Date(t.user.created_at)).fromNow() }</div>
+								</div>
+							</div>
+						</div>
+						<div className="col s12">
+							<div className="tweet-row">
+								<div className="body">
+									<blockquote>
+										{ t.text }
+									</blockquote>
+								</div>
+								<div className="stats right">
+									<div className="chip">{ moment(new Date(t.created_at)).fromNow() }</div>
+									<div className="chip"><i className="fa fa-retweet"></i> { t.retweet_count }</div>
+									<div className="chip"><i className="fa fa-heart"></i> { t.favorite_count }</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		);
 	}
 });
 
 
+
+
+// Top level component and application entry point. This contains/manages the toplevel 
+// state for filters and the tweet list.
+// There is no pagination, but infinite scroll would not be terrible to add. You would have to maintain the
+// page state along with the 'tweets' list and modify the endpoints to take an extra query param specifying
+// page number.
 let ApplicationContainer = React.createClass({
 	getInitialState() {
 	    return {
-	        handle: undefined,
-	        view: ''
+	    	filter: {
+	    		// default to turner, maybe store the default in a cookie or require OAuth for use.
+	    		screenName: 'TBSInc'
+	    	}
 	    };
 	},
-	updateHandle(e, data) {
-		console.log("Changing auth: " + data.oldHandle + " => " + data.newHandle);
+	// ideally, this would be moved into redux
+	_updateSearchResults(filter) {
+		let self = this;
+		// the api call should probably be moved into a simplified client library that could be
+		// opensourced should the need arise.
+		$.get("/api/twitter/search?q=" + filter.q)
+			.done((data) => {
+				console.log(data);
+				self.setState({
+					tweets: data.statuses
+				});
+			});
+	},
+	// ideally, this would be moved into redux
+	_updateTimelineResults(filter) {
+		let self = this;
+		// the api call should probably be moved into a simplified client library that could be
+		// opensourced should the need arise.
+		$.get("/api/twitter/timeline?screen_name=" + filter.screenName)
+			.done((data) => {
+				console.log(data);
+				self.setState({
+					tweets: data
+				});
+			});
+	},
+	// ideally, this would be moved into redux
+	_updateFilter(filter = this.state.filter) {
 		this.setState({
-			handle: data.newHandle,
-			view: <InboxContainer handle={ data.newHandle } />
+			filter,
+			tweets: undefined
 		});
+		// this conditional logic could be removed by replacing it with events driven logic.
+		if (!!filter.screenName) {
+			this._updateTimelineResults(filter);
+		} else if (!!filter.q) {
+			this._updateSearchResults(filter);
+		}
 	},
+	// leverage react lifestyles to pre-populate the app state with default data
 	componentWillMount() {
-		$('body').on('twitter:onHandleChange', this.updateHandle);
+	    this._updateFilter();
 	},
-	componentDidMount() {
-		setTimeout(() => {
-			this.updateHandle(null, { newHandle: 'dhh' });
-		}, 1000);
-	},
+	// depending on the size of the app and nav structure, this could potentially be moved into a main-layout.jsx file.
 	render() {
 		return (
 			<div className="ApplicationContainer">
 				<div className="container">
 					<div className="row">
-						<div className="col s3">
-							<LeftNav handle={ this.state.handle } />
+						<div className="col s12 section">
+							<FilterForm filter={ this.state.filter } onUpdateFilter={ this._updateFilter } />
 						</div>
-						<div className="col s9">
-							{ this.state.view }
+						<div className="col m10 offset-m1 section">
+							<TweetList tweets={ this.state.tweets } />
 						</div>
 					</div>
 				</div>
-				
 			</div>
 		);
 	}
@@ -154,131 +369,3 @@ ReactDOM.render(
         <ApplicationContainer />,
         document.getElementById('app-container')
       );
-
-
-/*
-===================================
-		INBOX
-===================================
-*/
-
-let InboxContainer = React.createClass({
-	propTypes: {
-		handle: React.PropTypes.string.isRequired
-	},
-	getInitialState() {
-		return {
-			view: 'all'
-		};
-	},
-	componentDidMount() {
-	    $('ul.tabs').tabs();
-	},	
-	render() {
-		let content;
-		switch (this.state.view) {
-			case 'all':
-				content = <InboxAllContainer handle={ this.props.handle } />;
-				break;
-			default:
-				content = <div className="loading">Loading...</div>;
-		}
-		return (
-			<div className="InboxContainer">
-				<div className="cta-row">
-					<button className="waves-effect"><i className="fa fa-refresh"></i></button>
-				</div>
-				{ content }
-			</div>
-		);
-	}
-});
-
-let InboxAllContainer = React.createClass({
-	propTypes: {
-		handle: React.PropTypes.string.isRequired
-	},
-	getInitialState() {
-	    return { };
-	},
-	componentDidMount() {
-		let self = this;
-	    setTimeout(() => {
-			self.setState({
-				tweets: [
-					{
-						"favorited": false,
-						"created_at": "Wed Aug 29 17:12:58 +0000 2012",
-						"text": "Introducing the Twitter Certified Products Program: https://t.co/MjJ8xAnT",
-						"retweet_count": 121,
-						"id": 240859602684612608,
-						"retweeted": false,
-						"in_reply_to_user_id": null,
-						"user": {
-							"name": "Twitter API",
-							"profile_image_url": "https://pbs.twimg.com/profile_images/2556368541/alng5gtlmjhrdlr3qxqv_400x400.jpeg",
-							"id": 6253282,
-							"screen_name": "twitterapi"    
-						},
-						"in_reply_to_screen_name": null,
-						"in_reply_to_status_id": null  
-					}, {
-						"favorited": false,
-						"created_at": "Sat Aug 25 17:26:51 +0000 2012",
-						"contributors": null,
-						"text": "We are working to resolve issues with application management & logging in to the dev portal: https://t.co/p5bOzH0k ^TS",
-						"retweet_count": 105,
-						"id": 239413543487819778,
-						"retweeted": false,
-						"in_reply_to_user_id": null,
-						"user": {
-							"name": "Twitter API",
-							"profile_image_url": "https://pbs.twimg.com/profile_images/2556368541/alng5gtlmjhrdlr3qxqv_400x400.jpeg",
-							"id": 6253282,
-							"screen_name": "twitterapi"    
-						},
-						"in_reply_to_screen_name": null,
-						"in_reply_to_status_id": null  
-					}
-				]
-			});
-		}, 500);  
-	},
-	render() {
-		let { tweets } = this.state;
-		if (_.isUndefined(tweets)) {
-			return <div className="loading">Loading...</div>
-		}
-		return (
-			<div className="InboxAllList">
-				{ tweets.map((t) => <InboxRow tweet={ t } />) }
-			</div>
-		);
-	}
-});
-
-let InboxRow = React.createClass({
-	propTypes: {
-		tweet: React.PropTypes.object.isRequired
-	},
-	render() {
-		let { tweet: t } = this.props;
-		console.log(t.text);
-		return (
-			<div className="InboxRow">
-				<div className="tr-item">
-					<i className={ "fa fa-heart" + (t.favorited ? 'active' : '') }></i>
-				</div>
-				<div className="tr-item">
-					<div className="chip">{ moment(new Date(t.created_at)).fromNow() }</div>
-				</div>
-				<div className="tr-item">
-					<img src={ t.user.profile_image_url } className="circle"/>
-				</div>
-				<div className="tr-item">
-					<div className="text-muted">{ t.text }</div>
-				</div>
-			</div>
-		);
-	}
-});

@@ -1,44 +1,37 @@
+/*
+Ideally this would be generated from SASS during the build process.
+*/
+
+
+/*
+Uncommon default CSS style that I use in my POC projects. Don't do this in prod.
+*/
+img {
+	width: 100%;
+}
+
+
+/* borrowed utility from bootstrap */
 .text-muted {
 	color: #888;
 	font-style: italic;
 }
 
-.LeftNav {
-	border-right: 1px solid #ccc;
-	height: 100vh;
+/*
+Based on current UI trends, this could potentially be moved to be an inline style 
+since it is not re-used and is fairly specific to the existing component e.g. margin-right.
+*/
+.username-header {
+	font-size: 1.5em;
+	font-weight: bold;
+	color: #000;
+	margin-right: 1em;
 }
 
-	.LeftNav .nav-sect {
-		border-top: 1px solid #ccc;
-		padding: 1em;
-		margin: 1em;
-	}
 
-	.LeftNav .btn, .btn-flat {
-		width: 100%;
-	}
-
-
-
-.InboxContainer {
-	padding: 2em 0;
+/*
+Hacks to the rescue until there is time to integrate an appropriate grid layout lib e.g. masonry.
+*/
+.TweetTile {
+	height: 500px;
 }
-
-	.InboxContainer .cta-row {
-		border-bottom: 1px solid #ccc;
-		width: 100%;
-		padding: 0.5em;
-	}
-
-	.InboxContainer .InboxRow {
-		padding: 0.5em 0;
-	}
-
-	.InboxContainer .InboxRow .tr-item {
-		margin-right: 1em;
-		display: inline-block;
-	}
-
-	.InboxContainer .InboxRow img {
-		width: 2em;
-	}
