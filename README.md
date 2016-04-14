@@ -45,6 +45,8 @@ We would like you to develop a responsive page that displays twitter feeds. We w
 * package.json  // used to manage dependencies/build/run e.g. https://medium.freecodecamp.com/why-i-left-gulp-and-grunt-for-npm-scripts-3d6853dd22b8#.8hidpu0db
 * tpaMain.js  // node boot script
 
+Express serves static files from the `/ui` directory from the URL base. The twitter enpoints are located at `/api/twitter/[search, timeline]`
+
 #### Usage
 
 Install:
