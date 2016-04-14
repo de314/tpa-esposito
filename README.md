@@ -8,7 +8,7 @@ We would like you to develop a responsive page that displays twitter feeds. We w
 
 
 #### Requirement and Assumptions
-* Display a twitter feed
+* No restrictions on which/how twitter feed is displayed
 * Backend must be written in Node.js
 * Use front end framework/libraries of choice
 
