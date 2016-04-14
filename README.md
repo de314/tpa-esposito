@@ -62,7 +62,8 @@ npm start
 ```
 
 UI
-http://localhost:3000 or what ever port you used in `/app/conf/dev.js`. Port 3000 is default.
+
+<http://localhost:3000> or what ever port you used in `/app/conf/dev.js`. Port 3000 is default.
 
 Features:
 1. Use the tabs at the top to change tweet source. You can change between User Timeline and Twitter search.
